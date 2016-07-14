@@ -118,8 +118,56 @@ function ciniki_merchandise_productGet($ciniki) {
         $product['shipping_other'] = $product['shipping_other'] == 0 ? '' : numfmt_format_currency($intl_currency_fmt, $product['shipping_other'], $intl_currency);
         $product['shipping_CA'] = $product['shipping_CA'] == 0 ? '' : numfmt_format_currency($intl_currency_fmt, $product['shipping_CA'], $intl_currency);
         $product['shipping_US'] = $product['shipping_US'] == 0 ? '' : numfmt_format_currency($intl_currency_fmt, $product['shipping_US'], $intl_currency);
+
+        //
+        // Get any tags for this product
+        //
+        if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.merchandise', 0x04) ) {
+            $product['categories'] = array();
+            $strsql = "SELECT tag_type, tag_name AS lists "
+                . "FROM ciniki_merchandise_tags "
+                . "WHERE product_id = '" . ciniki_core_dbQuote($ciniki, $args['product_id']) . "' "
+                . "AND business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "ORDER BY tag_type, tag_name "
+                . "";
+            ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
+            $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.merchandise', array(
+                array('container'=>'tags', 'fname'=>'tag_type', 'name'=>'tags', 'fields'=>array('tag_type', 'lists'), 'dlists'=>array('lists'=>'::')),
+                ));
+            if( $rc['stat'] != 'ok' ) {
+                return $rc;
+            }
+            if( isset($rc['tags']) ) {
+                foreach($rc['tags'] as $tags) {
+                    if( $tags['tags']['tag_type'] == 10 ) {
+                        $product['categories'] = $tags['tags']['lists'];
+                    }
+                }
+            }
+        }
     }
 
-    return array('stat'=>'ok', 'product'=>$product);
+    $rsp = array('stat'=>'ok', 'product'=>$product);
+
+    //
+    // Check if all tags should be returned
+    //
+    $rsp['categories'] = array();
+    if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.merchandise', 0x04) ) {
+        //
+        // Get the available tags
+        //
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQueryList');
+        $strsql = "SELECT DISTINCT tag_name FROM ciniki_merchandise_tags WHERE tag_type = 10 AND business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' ";
+        $rc = ciniki_core_dbQueryList($ciniki, $strsql, 'ciniki.merchandise', 'categories', 'tag_name');
+        if( $rc['stat'] != 'ok' ) {
+            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3579', 'msg'=>'Unable to get list of categories', 'err'=>$rc['err']));
+        }
+        if( isset($rc['categories']) ) {
+            $rsp['categories'] = $rc['categories'];
+        }
+    }
+
+    return $rsp;
 }
 ?>

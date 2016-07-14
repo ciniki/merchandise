@@ -221,6 +221,7 @@ function ciniki_merchandise_main() {
             }
             var p = M.ciniki_merchandise_main.product;
             p.data = rsp.product;
+            p.sections._categories.fields.categories.tags = [];
             if( rsp.categories != null ) {
                 p.sections._categories.fields.categories.tags = rsp.categories;
             }
@@ -232,6 +233,7 @@ function ciniki_merchandise_main() {
         if( cb == null ) { cb = 'M.ciniki_merchandise_main.product.close();'; }
         if( this.product_id > 0 ) {
             var c = this.serializeForm('no');
+            console.log(c);
             if( c != '' ) {
                 M.api.postJSONCb('ciniki.merchandise.productUpdate', {'business_id':M.curBusinessID, 'product_id':this.product_id}, c,
                     function(rsp) {

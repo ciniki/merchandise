@@ -41,6 +41,7 @@ function ciniki_merchandise_productAdd(&$ciniki) {
         'object'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Object'),
         'object_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Object ID'),
         'image_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Additional Image'),
+        'categories'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'list', 'delimiter'=>'::', 'name'=>'Categories'),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -129,6 +130,18 @@ function ciniki_merchandise_productAdd(&$ciniki) {
         return $rc;
     }
     $product_id = $rc['id'];
+
+    //
+    // Update the categories
+    //
+    if( isset($args['categories']) ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'tagsUpdate');
+        $rc = ciniki_core_tagsUpdate($ciniki, 'ciniki.merchandise', 'tag', $args['business_id'], 'ciniki_merchandise_tags', 'ciniki_merchandise_history', 'product_id', $product_id, 10, $args['categories']);
+        if( $rc['stat'] != 'ok' ) {
+            ciniki_core_dbTransactionRollback($ciniki, 'ciniki.merchandise');
+            return $rc;
+        }
+    }
 
     //
     // Add additional image if supplied
