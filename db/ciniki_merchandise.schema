@@ -21,14 +21,16 @@
 #
 # sequence:                 The order to show this product in a list.
 #
-# flags:                    The flags for the product.
+# flags:                    The flags for the product. The shipped product and digital download
+#                           can both be enabled at the same time to allow for Shipped CD and download
+#                           of MP3 files.
 #
-#                           0x01 - Visible, display on website
-#                           0x02 - Sell Online
+#                           0x01 - Visible, display on website, must also be Active
+#                           0x02 - Sell Online, Must be visible and Active.
 #                           0x04 - 
 #                           0x08 - Sold Out
-#                           0x10 -
-#                           0x20 -
+#                           0x10 - Shipped Product
+#                           0x20 - Digital Download
 #                           0x40 -
 #                           0x80 -
 #
@@ -37,13 +39,11 @@
 # unit_discount_percentage: The percentage the product is currently discounted.
 # taxtype_id:               The ID of the tax type.
 #
-# inventory_current_num:    The current number available for sale.
+# inventory:                The current number available for sale.
 #
-# shipping_weight:          The weight of the product for shipping.
-# shipping_weight_units:    The weight measurement type lb or kg.
-#
-#                           10 - lb(s)
-#                           20 - kg(s)
+# shipping_other            The cost of shipping anywhere in the world.
+# shipping_CA:              The cost of shipping to Canada.
+# shipping_US:              The cost of shipping to United States.
 #
 # primary_image_id:         The ID of the image to show in listings and top of product page.
 #
@@ -68,9 +68,10 @@ create table ciniki_merchandise (
     unit_discount_amount decimal(19,4) not null,
     unit_discount_percentage decimal(19,4) not null,
     taxtype_id int not null,
-    inventory_current_num int not null,
-    shipping_weight decimal(10,4) not null,
-    shipping_weight_units tinyint unsigned not null,
+    inventory int not null,
+    shipping_other decimal(19,4) not null,
+    shipping_US decimal(19,4) not null,
+    shipping_CA decimal(19,4) not null,
     primary_image_id int not null,
     synopsis varchar(1000) not null,
     description varchar(20000) not null,

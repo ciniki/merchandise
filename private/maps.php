@@ -21,10 +21,9 @@ function ciniki_merchandise_maps($ciniki) {
         'flags'=>array(
             0x01=>'Visible',
             0x02=>'Sell Online',
-            ),
-        'shipping_weight_units'=>array(
-            '10'=>'lb',
-            '20'=>'kg',
+            0x08=>'Sold Out',
+            0x10=>'Shipped Product',
+            0x20=>'Digital Download',
             ),
         );
 
