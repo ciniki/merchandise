@@ -2,7 +2,7 @@
 //
 // Description
 // -----------
-// This method will return the list of Merchandise Products for a business.
+// This method searchs the products for a name or code that matches the start needle.
 //
 // Arguments
 // ---------
@@ -13,13 +13,15 @@
 // Returns
 // -------
 //
-function ciniki_merchandise_productList($ciniki) {
+function ciniki_merchandise_productSearch($ciniki) {
     //
     // Find all the required and optional arguments
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'start_needle'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Search String'),
+        'limit'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Limit'),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -59,6 +61,23 @@ function ciniki_merchandise_productList($ciniki) {
         . "FROM ciniki_merchandise "
         . "WHERE ciniki_merchandise.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
         . "";
+    if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.merchandise', 0x01) ) {
+        $strsql .= "AND (code LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+            . "OR code LIKE '% " . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+            . "OR name LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+            . "OR name LIKE '% " . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+            . ") ";
+    } else {
+        $strsql .= "AND (name LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+            . "OR name LIKE '% " . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+            . ") ";
+    }
+    if( isset($args['limit']) && is_numeric($args['limit']) && $args['limit'] > 0 ) {
+        $strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
+    } else {
+        $strsql .= "LIMIT 25 ";
+    }
+
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.merchandise', array(
         array('container'=>'products', 'fname'=>'id', 
@@ -69,11 +88,11 @@ function ciniki_merchandise_productList($ciniki) {
     }
     if( isset($rc['products']) ) {
         $products = $rc['products'];
-        foreach($rc['products'] as $pid => $product) {
+        foreach($products as $pid => $product) {
             if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.merchandise', 0x01) && $product['code'] != '' ) {
-                $rc['products'][$pid]['display_name'] = $product['code'] . ' - ' . $product['name'];
+                $products[$pid]['display_name'] = $product['code'] . ' - ' . $product['name'];
             } else {
-                $rc['products'][$pid]['display_name'] = $product['name'];
+                $products[$pid]['display_name'] = $product['name'];
             }
         }
     } else {

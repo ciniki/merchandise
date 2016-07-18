@@ -114,7 +114,7 @@ function ciniki_merchandise_main() {
             }},
         'general':{'label':'Product', 'aside':'yes', 'fields':{
             'code':{'label':'Code', 'type':'text', 'active':function() { return M.modFlagSet('ciniki.merchandise', 0x01);}, 'size':'small'},
-            'name':{'label':'Name', 'type':'text'},
+            'name':{'label':'Name', 'type':'text', 'livesearch':'yes'},
             'status':{'label':'Status', 'type':'toggle', 'toggles':{'10':'Active', '50':'Inactive', '60':'Deleted'}},
             'flags1':{'label':'Options', 'type':'flagspiece', 'field':'flags', 'mask':0x0F, 'flags':{
                 '1':{'name':'Visible'},
@@ -151,6 +151,8 @@ function ciniki_merchandise_main() {
             'addTxt':'Add Additional Image',
             'addFn':'M.ciniki_merchandise_main.product.save("M.ciniki_merchandise_main.productimage.edit(\'M.ciniki_merchandise_main.product.refreshImages();\',0,M.ciniki_merchandise_main.product.product_id);");',
             },
+        'objrefs':{'label':'Attached to', 'type':'simplegrid', 'num_cols':2,
+            },
         '_buttons':{'label':'', 'buttons':{
             'save':{'label':'Save', 'fn':'M.ciniki_merchandise_main.product.save();'},
             'delete':{'label':'Delete', 'visible':function() {return M.ciniki_merchandise_main.product.product_id>0?'yes':'no';}, 
@@ -181,6 +183,41 @@ function ciniki_merchandise_main() {
     }
     this.product.fieldHistoryArgs = function(s, i) {
         return {'method':'ciniki.merchandise.productHistory', 'args':{'business_id':M.curBusinessID, 'product_id':this.product_id, 'field':i}};
+    }
+    this.product.cellValue = function(s, i, j, d) {
+        switch(j) {
+            case 0: return d.display_name;
+            case 1: return '<button onclick="event.stopPropagation(); M.ciniki_merchandise_main.product.removeObjRef(event,' + i + ');">Remove</button>';
+        }
+    }
+    this.product.liveSearchCb = function(s, i, v) {
+        if( i == 'name' && v != '' ) {
+            M.api.getJSONBgCb('ciniki.merchandise.productSearch', {'business_id':M.curBusinessID, 'start_needle':v},
+                function(rsp) {
+                    M.ciniki_merchandise_main.product.liveSearchShow(s, i, M.gE(M.ciniki_merchandise_main.product.panelUID + '_' + i), rsp.products);
+                });
+            return true;
+        }
+    }
+    this.product.liveSearchResultValue = function(s, f, i, j, d) {
+        if( f == 'name' ) {
+            return d.display_name;
+        }
+    }
+    this.product.liveSearchResultRowFn = function(s, f, i, j, d) {
+        if( f == 'name' ) {
+            return 'M.ciniki_merchandise_main.product.addObjRef(\'' + d.id + '\');';
+        }
+    }
+    this.product.addObjRef = function(id) {
+        M.api.getJSONCb('ciniki.merchandise.productAddObjRef', {'business_id':M.curBusinessID, 'product_id':id, 'object':this.object, 'object_id':this.object_id},
+            function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                } 
+                M.ciniki_merchandise_main.product.close();
+        })
     }
     this.product.addDropImage = function(iid) {
         if( this.product_id == 0 ) {
@@ -261,8 +298,20 @@ function ciniki_merchandise_main() {
                 });
         }
     };
+    this.product.removeObjRef = function(event, i) {
+        if( confirm('Are you sure you want to remove the product from ' + this.data.objrefs[i].display_name + '?') ) {
+            M.api.getJSONCb('ciniki.merchandise.productDeleteObjRef', {'business_id':M.curBusinessID, 'objref_id':this.data.objrefs[i].id}, function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                } 
+                delete(M.ciniki_merchandise_main.product.data.objrefs[i]);
+                M.ciniki_merchandise_main.product.refreshSection('objrefs');
+            });
+        }
+    }
     this.product.remove = function() {
-        if( confirm('Are you sure you want to remove this product?') ) {
+        if( confirm('Do you want to remove this product? It will be removed from your shop and all other items it is attached to.') ) {
             M.api.getJSONCb('ciniki.merchandise.productDelete', {'business_id':M.curBusinessID, 'product_id':this.product_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);

@@ -145,6 +145,40 @@ function ciniki_merchandise_productGet($ciniki) {
                 }
             }
         }
+
+        //
+        // Get the list of object references for this product
+        //
+        $strsql = "SELECT id, object, object_id, 'Unknown' as display_name "
+            . "FROM ciniki_merchandise_objrefs "
+            . "WHERE product_id = '" . ciniki_core_dbQuote($ciniki, $args['product_id']) . "' "
+            . "";
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+        $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.merchandise', array(
+            array('container'=>'objrefs', 'fname'=>'id', 'fields'=>array('id', 'object', 'object_id', 'display_name')),
+            ));
+        if( $rc['stat'] != 'ok' ) {
+            return $rc;
+        }
+        if( isset($rc['objrefs']) ) {
+            $product['objrefs'] = $rc['objrefs'];
+            foreach($product['objrefs'] as $rid => $ref) {
+                list($pkg, $mod, $obj) = explode('.', $ref['object']);
+                $rc = ciniki_core_loadMethod($ciniki, $pkg, $mod, 'hooks', 'getObjectName');
+                if( $rc['stat'] == 'ok' ) {
+                    $fn = $rc['function_call'];
+                    $rc = $fn($ciniki, $args['business_id'], array(
+                        'object'=>$ref['object'],
+                        'object_id'=>$ref['object_id']
+                        ));
+                    if( $rc['stat'] == 'ok' && isset($rc['name']) ) {
+                        $product['objrefs'][$rid]['display_name'] = $rc['name'];
+                    }
+                }
+            }
+        } else {
+            $product['objrefs'] = array();
+        }
     }
 
     $rsp = array('stat'=>'ok', 'product'=>$product);

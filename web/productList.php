@@ -35,7 +35,8 @@ function ciniki_merchandise_web_productList($ciniki, $settings, $business_id, $a
             . "ciniki_merchandise.inventory, "
             . "ciniki_merchandise.unit_amount, "
             . "ciniki_merchandise.primary_image_id, "
-            . "ciniki_merchandise.synopsis "
+            . "ciniki_merchandise.synopsis, "
+            . "'yes' AS is_details "
             . "FROM ciniki_merchandise_objrefs "
             . "LEFT JOIN ciniki_merchandise ON ("
                 . "ciniki_merchandise_objrefs.product_id = ciniki_merchandise.id "
@@ -50,13 +51,14 @@ function ciniki_merchandise_web_productList($ciniki, $settings, $business_id, $a
             . "";
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.merchandise', array(
-            array('container'=>'products', 'fname'=>'id', 'fields'=>array('id', 'code', 'name', 'permalink', 'image_id'=>'primary_image_id', 'synopsis')),
+            array('container'=>'products', 'fname'=>'id', 'fields'=>array('id', 'code', 'name', 'permalink', 'image_id'=>'primary_image_id', 'synopsis', 'is_details')),
             ));
         if( $rc['stat'] != 'ok' ) {
             return $rc;
         }
         if( isset($rc['products']) ) {
             foreach($rc['products'] as $pid => $product) {
+                $rc['products'][$pid]['localurl'] = '/merchandise/' . $product['permalink'];
                 if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.merchandise', 0x01) ) {
                     $rc['products'][$pid]['title'] = ($product['code'] != '' ? $product['code'] . ' - ' : '') . $product['name'];
                 } else {
