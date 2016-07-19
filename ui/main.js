@@ -9,53 +9,53 @@ function ciniki_merchandise_main() {
     this.menu.category = '';
     this.menu.nextPrevList = [];
     this.menu.sections = {
-        '_tabs':{'label':'', 'type':'menutabs', 'selected':'ingredients', 'tabs':{
-            'products':{'label':'Products', 'fn':'M.ciniki_merchandise_main.menu.open(null,"products");'},
-            'orders':{'label':'Orders', 'fn':'M.ciniki_merchandise_main.menu.open(null,"orders");'},
+//        '_tabs':{'label':'', 'type':'menutabs', 'selected':'ingredients', 'tabs':{
+//            'products':{'label':'Products', 'fn':'M.ciniki_merchandise_main.menu.open(null,"products");'},
+//            'orders':{'label':'Orders', 'fn':'M.ciniki_merchandise_main.menu.open(null,"orders");'},
 //            'inventory':{'label':'Inventory', 'fn':'M.ciniki_merchandise_main.menu.open(null,"inventory");'},
-            }},
-/*        'product_search':{'label':'', 'type':'livesearchgrid', 'livesearchcols':1, 
-            'visible':function() {return M.ciniki_merchandise_main.menu.sections._tabs.selected=='products'?'yes':'no';},
+//            }},
+        'product_search':{'label':'', 'type':'livesearchgrid', 'livesearchcols':1, 
+//            'visible':function() {return M.ciniki_merchandise_main.menu.sections._tabs.selected=='products'?'yes':'no';},
             'cellClasses':['multiline'],
             'hint':'Search notes', 
             'noData':'No notes found',
-            }, */
+            }, 
         'products':{'label':'Products', 'type':'simplegrid', 'num_cols':1, 
-            'visible':function() {return M.ciniki_merchandise_main.menu.sections._tabs.selected=='products'?'yes':'no';},
+//            'visible':function() {return M.ciniki_merchandise_main.menu.sections._tabs.selected=='products'?'yes':'no';},
             'noData':'No products',
             'addTxt':'Add Product',
             'addFn':'M.ciniki_merchandise_main.product.open(\'M.ciniki_merchandise_main.menu.open();\',0,null,\'\',0);',
             },
-        'orders':{'label':'Ailments', 'type':'simplegrid', 'num_cols':1, 
-            'visible':function() {return M.ciniki_merchandise_main.menu.sections._tabs.selected=='orders'?'yes':'no';},
-            'noData':'No Orders',
-            },
+//        'orders':{'label':'Ailments', 'type':'simplegrid', 'num_cols':1, 
+//            'visible':function() {return M.ciniki_merchandise_main.menu.sections._tabs.selected=='orders'?'yes':'no';},
+//            'noData':'No Orders',
+//            },
     };
     this.menu.sectionData = function(s) {
         return this.data[s];
     };
     this.menu.noData = function(s) { return this.sections[s].noData; }
-/*    this.menu.liveSearchCb = function(s, i, v) {
-        if( s == 'note_search' && v != '' ) {
-            M.api.getJSONBgCb('ciniki.merchandise.noteSearch', {'business_id':M.curBusinessID, 'search_str':v, 'limit':'50'}, function(rsp) {
-                    M.ciniki_merchandise_main.menu.liveSearchShow('note_search',null,M.gE(M.ciniki_merchandise_main.menu.panelUID + '_' + s), rsp.notes);
+    this.menu.liveSearchCb = function(s, i, v) {
+        if( s == 'product_search' && v != '' ) {
+            M.api.getJSONBgCb('ciniki.merchandise.productSearch', {'business_id':M.curBusinessID, 'start_needle':v, 'limit':'50'}, function(rsp) {
+                    M.ciniki_merchandise_main.menu.liveSearchShow('product_search',null,M.gE(M.ciniki_merchandise_main.menu.panelUID + '_' + s), rsp.products);
                 });
         }
     }
     this.menu.liveSearchResultValue = function(s, f, i, j, d) {
-        if( s == 'note_search' ) { 
-            return '<span class="maintext">' + d.note_date + '</span><span class="subtext">' + d.content + '</span><span class="subsubtext">' + d.keywords + '</span>';
+        if( s == 'product_search' ) { 
+            return d.display_name;
         }
     }
     this.menu.liveSearchResultRowFn = function(s, f, i, j, d) {
-        if( s == 'note_search' ) {
-            return 'M.ciniki_merchandise_main.note.edit(\'M.ciniki_merchandise_main.menu.show();\',\'' + d.id + '\');';
+        if( s == 'product_search' ) {
+            return 'M.ciniki_merchandise_main.product.open(\'M.ciniki_merchandise_main.menu.show();\',\'' + d.id + '\');';
         }
-    }*/
+    }
     this.menu.cellValue = function(s, i, j, d) {
         if( s == 'products' ) {
             switch (j) {
-                case 0: return d.name;
+                case 0: return d.display_name;
             }
         }
     };
@@ -68,14 +68,14 @@ function ciniki_merchandise_main() {
         this.data = {};
         //if( tab != null ) { this.sections._tabs.selected = tab; }
         args = {'business_id':M.curBusinessID};
-        method = '';
-        switch( this.sections._tabs.selected ) {
-            case 'products': method = 'ciniki.merchandise.productList'; break;
-            case 'orders': method = 'ciniki.merchandise.orderList'; break;
-        } 
-        if( this.sections._tabs.selected == 'products' || this.sections._tabs.selected == 'inventory' ) {
-            args['category'] = this.category;
-        }
+        method = 'ciniki.merchandise.productList';
+//        switch( this.sections._tabs.selected ) {
+//            case 'products': method = 'ciniki.merchandise.productList'; break;
+//            case 'orders': method = 'ciniki.merchandise.orderList'; break;
+//        } 
+//        if( this.sections._tabs.selected == 'products' || this.sections._tabs.selected == 'inventory' ) {
+//            args['category'] = this.category;
+//        }
         M.api.getJSONCb(method, args, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
@@ -83,6 +83,7 @@ function ciniki_merchandise_main() {
             }
             var p = M.ciniki_merchandise_main.menu;
             p.data = rsp;
+            p.nextPrevList = null;
             if( rsp.nextprevlist != null ) {
                 p.nextPrevList = rsp.nextprevlist;
             }
@@ -121,10 +122,7 @@ function ciniki_merchandise_main() {
                 '2':{'name':'Sell Online'},
                 '4':{'name':'Sold Out'},
                 }},
-            'flags2':{'label':'Options', 'type':'flagspiece', 'field':'flags', 'mask':0x30, 'flags':{
-                '5':{'name':'Shipped Product'},
-                '6':{'name':'Digital Download'},
-                }},
+            'flags2':{'label':'Shipped', 'type':'flagtoggle', 'field':'flags', 'bit':0x10, 'on_sections':['shipping']},
             }},
         'pricing':{'label':'', 'aside':'yes', 'fields':{
             'unit_amount':{'label':'Price', 'type':'text', 'size':'small'},

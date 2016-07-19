@@ -35,9 +35,13 @@ function ciniki_merchandise_web_productList($ciniki, $settings, $business_id, $a
             . "ciniki_merchandise.inventory, "
             . "ciniki_merchandise.unit_amount, "
             . "ciniki_merchandise.primary_image_id, "
-            . "ciniki_merchandise.synopsis, "
-            . "'yes' AS is_details "
-            . "FROM ciniki_merchandise_objrefs "
+            . "ciniki_merchandise.synopsis, ";
+        if( isset($settings['page-merchandise-active']) && $settings['page-merchandise-active'] == 'yes' ) {
+            $strsql .= "'yes' AS is_details ";
+        } else {
+            $strsql .= "'no' AS is_details ";
+        }
+        $strsql .= "FROM ciniki_merchandise_objrefs "
             . "LEFT JOIN ciniki_merchandise ON ("
                 . "ciniki_merchandise_objrefs.product_id = ciniki_merchandise.id "
                 . "AND ciniki_merchandise.status = 10 "
