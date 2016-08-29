@@ -22,12 +22,12 @@ function ciniki_merchandise_imageAdd(&$ciniki) {
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
         'product_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Product'),
-        'name'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Name'),
+        'name'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Title'),
         'permalink'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Permalink'),
-        'sequence'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Sequence'),
+        'sequence'=>array('required'=>'no', 'blank'=>'no', 'default'=>'1', 'name'=>'Sequence'),
         'flags'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Options'),
         'image_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Image'),
-        'description'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Description'),
+        'description'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Description'),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;

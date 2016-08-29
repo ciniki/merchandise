@@ -63,7 +63,7 @@ function ciniki_merchandise_imageGet($ciniki) {
             'permalink'=>'',
             'sequence'=>'',
             'flags'=>'1',
-            'image_id'=>'',
+            'image_id'=>0,
             'description'=>'',
         );
     }

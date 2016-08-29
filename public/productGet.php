@@ -22,6 +22,7 @@ function ciniki_merchandise_productGet($ciniki) {
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
         'product_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Merchandise Product'),
+        'images'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Images'),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -75,6 +76,7 @@ function ciniki_merchandise_productGet($ciniki) {
             'primary_image_id'=>'0',
             'synopsis'=>'',
             'description'=>'',
+            'images'=>array(),
         );
     }
 
@@ -178,6 +180,41 @@ function ciniki_merchandise_productGet($ciniki) {
             }
         } else {
             $product['objrefs'] = array();
+        }
+
+        //
+        // Get the additional images for this product
+        //
+        if( isset($args['images']) && $args['images'] == 'yes' ) {
+            ciniki_core_loadMethod($ciniki, 'ciniki', 'images', 'hooks', 'loadThumbnail');
+            $strsql = "SELECT ciniki_merchandise_images.id, "
+                . "ciniki_merchandise_images.image_id, "
+                . "ciniki_merchandise_images.name, "
+                . "ciniki_merchandise_images.sequence, "
+                . "ciniki_merchandise_images.description "
+                . "FROM ciniki_merchandise_images "
+                . "WHERE ciniki_merchandise_images.product_id = '" . ciniki_core_dbQuote($ciniki, $args['product_id']) . "' "
+                . "AND ciniki_merchandise_images.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "ORDER BY ciniki_merchandise_images.sequence, ciniki_merchandise_images.date_added, ciniki_merchandise_images.name "
+                . "";
+            $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.artcatalog', array(
+                array('container'=>'images', 'fname'=>'id', 'fields'=>array('id', 'image_id', 'name', 'sequence', 'description')),
+                ));
+            if( $rc['stat'] != 'ok' ) { 
+                return $rc;
+            }
+            if( isset($rc['images']) ) {
+                $product['images'] = $rc['images'];
+                foreach($product['images'] as $inum => $img) {
+                    if( isset($img['image_id']) && $img['image_id'] > 0 ) {
+                        $rc = ciniki_images_hooks_loadThumbnail($ciniki, $args['business_id'], array('image_id'=>$img['image_id'], 'maxlength'=>75));
+                        if( $rc['stat'] != 'ok' ) {
+                            return $rc;
+                        }
+                        $product['images'][$inum]['image_data'] = 'data:image/jpg;base64,' . base64_encode($rc['image']);
+                    }
+                }
+            }
         }
     }
 
