@@ -109,10 +109,10 @@ function ciniki_merchandise_productGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
         $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.merchandise', 'product');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3063', 'msg'=>'Merchandise Product not found', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.17', 'msg'=>'Merchandise Product not found', 'err'=>$rc['err']));
         }
         if( !isset($rc['product']) ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3064', 'msg'=>'Unable to find Merchandise Product'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.18', 'msg'=>'Unable to find Merchandise Product'));
         }
         $product = $rc['product'];
         $product['unit_amount'] = $product['unit_amount'] == 0 ? '' : numfmt_format_currency($intl_currency_fmt, $product['unit_amount'], $intl_currency);
@@ -232,7 +232,7 @@ function ciniki_merchandise_productGet($ciniki) {
         $strsql = "SELECT DISTINCT tag_name FROM ciniki_merchandise_tags WHERE tag_type = 10 AND business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' ";
         $rc = ciniki_core_dbQueryList($ciniki, $strsql, 'ciniki.merchandise', 'categories', 'tag_name');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3579', 'msg'=>'Unable to get list of categories', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.19', 'msg'=>'Unable to get list of categories', 'err'=>$rc['err']));
         }
         if( isset($rc['categories']) ) {
             $rsp['categories'] = $rc['categories'];

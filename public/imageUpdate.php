@@ -58,7 +58,7 @@ function ciniki_merchandise_imageUpdate(&$ciniki) {
             return $rc;
         }
         if( $rc['num_rows'] > 0 ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3070', 'msg'=>'You already have an image with this name, please choose another.'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.9', 'msg'=>'You already have an image with this name, please choose another.'));
         }
     }
 

@@ -62,7 +62,7 @@ function ciniki_merchandise_productAdd(&$ciniki) {
     //
     if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.merchandise', 0x01) ) {
         if( !isset($args['code']) || $args['code'] == '' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3071', 'msg'=>'You must specify a code.'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.10', 'msg'=>'You must specify a code.'));
         }
         
         $strsql = "SELECT id, code, permalink "
@@ -75,7 +75,7 @@ function ciniki_merchandise_productAdd(&$ciniki) {
             return $rc;
         }
         if( $rc['num_rows'] > 0 ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3072', 'msg'=>'You already have a product with that code, please choose another.'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.11', 'msg'=>'You already have a product with that code, please choose another.'));
         }
     }
 
@@ -105,7 +105,7 @@ function ciniki_merchandise_productAdd(&$ciniki) {
         return $rc;
     }
     if( $rc['num_rows'] > 0 ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3061', 'msg'=>'You already have a merchandise product with that name, please choose another.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.12', 'msg'=>'You already have a merchandise product with that name, please choose another.'));
     }
 
     //
@@ -153,7 +153,7 @@ function ciniki_merchandise_productAdd(&$ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbUUID');
         $rc = ciniki_core_dbUUID($ciniki, 'ciniki.merchandise');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3573', 'msg'=>'Unable to get a new UUID', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.13', 'msg'=>'Unable to get a new UUID', 'err'=>$rc['err']));
         }
         $args['uuid'] = $rc['uuid'];
 

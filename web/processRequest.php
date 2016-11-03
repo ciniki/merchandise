@@ -19,7 +19,7 @@
 function ciniki_merchandise_web_processRequest(&$ciniki, $settings, $business_id, $args) {
 
     if( !isset($ciniki['business']['modules']['ciniki.merchandise']) ) {
-        return array('stat'=>'404', 'err'=>array('pkg'=>'ciniki', 'code'=>'3581', 'msg'=>"I'm sorry, the page you requested does not exist."));
+        return array('stat'=>'404', 'err'=>array('code'=>'ciniki.merchandise.23', 'msg'=>"I'm sorry, the page you requested does not exist."));
     }
     $page = array(
         'title'=>$args['page_title'],
@@ -202,10 +202,10 @@ function ciniki_merchandise_web_processRequest(&$ciniki, $settings, $business_id
         ciniki_core_loadMethod($ciniki, 'ciniki', 'merchandise', 'web', 'productLoad');
         $rc = ciniki_merchandise_web_productLoad($ciniki, $business_id, array('permalink'=>$product_permalink, 'images'=>'yes'));
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'404', 'err'=>array('pkg'=>'ciniki', 'code'=>'3582', 'msg'=>"We're sorry, the page you requested is not available."));
+            return array('stat'=>'404', 'err'=>array('code'=>'ciniki.merchandise.24', 'msg'=>"We're sorry, the page you requested is not available."));
         }
         if( !isset($rc['product']) ) {
-            return array('stat'=>'404', 'err'=>array('pkg'=>'ciniki', 'code'=>'3583', 'msg'=>"We're sorry, the page you requested is not available."));
+            return array('stat'=>'404', 'err'=>array('code'=>'ciniki.merchandise.25', 'msg'=>"We're sorry, the page you requested is not available."));
         } else {
             $product = $rc['product'];
             $page['title'] = $product['name'];
@@ -267,7 +267,7 @@ function ciniki_merchandise_web_processRequest(&$ciniki, $settings, $business_id
     // Return error if nothing found to display
     //
     if( $display == '' ) {
-        return array('stat'=>'404', 'err'=>array('pkg'=>'ciniki', 'code'=>'3584', 'msg'=>"We're sorry, the page you requested is not available."));
+        return array('stat'=>'404', 'err'=>array('code'=>'ciniki.merchandise.26', 'msg'=>"We're sorry, the page you requested is not available."));
     }
 
     return array('stat'=>'ok', 'page'=>$page);

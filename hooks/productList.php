@@ -65,6 +65,6 @@ function ciniki_merchandise_hooks_productList($ciniki, $business_id, $args) {
         }
     }
 
-    return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3574', 'msg'=>'Unable to get the product list'));
+    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.1', 'msg'=>'Unable to get the product list'));
 }
 ?>

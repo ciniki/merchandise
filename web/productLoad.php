@@ -33,15 +33,15 @@ function ciniki_merchandise_web_productLoad($ciniki, $business_id, $args) {
     } elseif( isset($args['id']) && $args['id'] > 0 ) {
         $strsql .= "AND ciniki_merchandise.id = '" . ciniki_core_dbQuote($ciniki, $args['id']) . "' ";
     } else {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3585', 'msg'=>'No product specified'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.27', 'msg'=>'No product specified'));
     }
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.merchandise', 'product');
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3586', 'msg'=>'Product not found', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.28', 'msg'=>'Product not found', 'err'=>$rc['err']));
     }
     if( !isset($rc['product']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3587', 'msg'=>'Unable to find Product'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.29', 'msg'=>'Unable to find Product'));
     }
     $product = $rc['product'];
 

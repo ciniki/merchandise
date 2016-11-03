@@ -65,7 +65,7 @@ function ciniki_merchandise_productUpdate(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['product']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3492', 'msg'=>'That product does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.20', 'msg'=>'That product does not exist.'));
     }
     $product = $rc['product'];
 
@@ -84,7 +84,7 @@ function ciniki_merchandise_productUpdate(&$ciniki) {
             return $rc;
         }
         if( $rc['num_rows'] > 0 ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3498', 'msg'=>'You already have a product with that code, please choose another.'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.21', 'msg'=>'You already have a product with that code, please choose another.'));
         }
     }
 
@@ -110,7 +110,7 @@ function ciniki_merchandise_productUpdate(&$ciniki) {
             return $rc;
         }
         if( $rc['num_rows'] > 0 ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3065', 'msg'=>'You already have an merchandise product with this name, please choose another.'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.22', 'msg'=>'You already have an merchandise product with this name, please choose another.'));
         }
     }
 

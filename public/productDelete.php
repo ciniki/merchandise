@@ -53,7 +53,7 @@ function ciniki_merchandise_productDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['product']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3062', 'msg'=>'Merchandise Product does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.16', 'msg'=>'Merchandise Product does not exist.'));
     }
     $product = $rc['product'];
 

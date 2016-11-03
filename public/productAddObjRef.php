@@ -52,7 +52,7 @@ function ciniki_merchandise_productAddObjRef(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['item']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3589', 'msg'=>'Unable to find product.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.14', 'msg'=>'Unable to find product.'));
     }
 
     //
@@ -70,7 +70,7 @@ function ciniki_merchandise_productAddObjRef(&$ciniki) {
         return $rc;
     }
     if( isset($rc['item']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3590', 'msg'=>'This product already exists.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.15', 'msg'=>'This product already exists.'));
     }
 
     //

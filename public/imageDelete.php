@@ -51,7 +51,7 @@ function ciniki_merchandise_imageDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['image']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'3067', 'msg'=>'Image does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.6', 'msg'=>'Image does not exist.'));
     }
     $image = $rc['image'];
 
