@@ -84,12 +84,13 @@ function ciniki_merchandise_objects($ciniki) {
             ),
         'history_table'=>'ciniki_merchandise_history',
         );
-    $objects['setting'] = array(
-        'type'=>'settings',
-        'name'=>'Merchandise Settings',
-        'table'=>'ciniki_merchandise_settings',
-        'history_table'=>'ciniki_merchandise_history',
-        );
+// Not yet implemented
+//    $objects['setting'] = array(
+//        'type'=>'settings',
+//        'name'=>'Merchandise Settings',
+//        'table'=>'ciniki_merchandise_settings',
+//        'history_table'=>'ciniki_merchandise_history',
+//        );
     
     return array('stat'=>'ok', 'objects'=>$objects);
 }
