@@ -9,13 +9,13 @@
 // Returns
 // -------
 //
-function ciniki_merchandise_web_productList($ciniki, $settings, $business_id, $args) {
+function ciniki_merchandise_web_productList($ciniki, $settings, $tnid, $args) {
 
     //
     // Load INTL settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $business_id);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $tnid);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -46,9 +46,9 @@ function ciniki_merchandise_web_productList($ciniki, $settings, $business_id, $a
                 . "ciniki_merchandise_objrefs.product_id = ciniki_merchandise.id "
                 . "AND ciniki_merchandise.status = 10 "
                 . "AND (ciniki_merchandise.flags&0x01) = 0x01 "
-                . "AND ciniki_merchandise.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+                . "AND ciniki_merchandise.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
                 . ") "
-            . "WHERE ciniki_merchandise_objrefs.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE ciniki_merchandise_objrefs.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND ciniki_merchandise_objrefs.object = '" . ciniki_core_dbQuote($ciniki, $args['object']) . "' "
             . "AND ciniki_merchandise_objrefs.object_id = '" . ciniki_core_dbQuote($ciniki, $args['object_id']) . "' "
             . "ORDER BY ciniki_merchandise_objrefs.sequence, ciniki_merchandise.name "

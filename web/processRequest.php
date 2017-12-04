@@ -8,7 +8,7 @@
 // ---------
 // ciniki:
 // settings:        The web settings structure.
-// business_id:        The ID of the business to get post for.
+// tnid:        The ID of the tenant to get post for.
 //
 // args:            The possible arguments for products
 //
@@ -16,9 +16,9 @@
 // Returns
 // -------
 //
-function ciniki_merchandise_web_processRequest(&$ciniki, $settings, $business_id, $args) {
+function ciniki_merchandise_web_processRequest(&$ciniki, $settings, $tnid, $args) {
 
-    if( !isset($ciniki['business']['modules']['ciniki.merchandise']) ) {
+    if( !isset($ciniki['tenant']['modules']['ciniki.merchandise']) ) {
         return array('stat'=>'404', 'err'=>array('code'=>'ciniki.merchandise.23', 'msg'=>"I'm sorry, the page you requested does not exist."));
     }
     $page = array(
@@ -50,10 +50,10 @@ function ciniki_merchandise_web_processRequest(&$ciniki, $settings, $business_id
             . "ciniki_merchandise_tags.permalink, "
             . "ciniki_merchandise_tags.tag_name AS title "
             . "FROM ciniki_merchandise, ciniki_merchandise_tags "
-            . "WHERE ciniki_merchandise.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE ciniki_merchandise.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND (ciniki_merchandise.flags&0x01) = 0x01 "  // Visible on website
             . "AND ciniki_merchandise.id = ciniki_merchandise_tags.product_id "
-            . "AND ciniki_merchandise_tags.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "AND ciniki_merchandise_tags.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND ciniki_merchandise_tags.tag_type = 10 "
             . "ORDER BY ciniki_merchandise_tags.permalink, ciniki_merchandise_tags.tag_name, ciniki_merchandise.primary_image_id DESC "
             . "";
@@ -143,7 +143,7 @@ function ciniki_merchandise_web_processRequest(&$ciniki, $settings, $business_id
         //
         $strsql = "SELECT id, code, name, permalink, primary_image_id AS image_id, synopsis, 'yes' AS is_details "
             . "FROM ciniki_merchandise "
-            . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND (flags&0x01) = 0x01 "
             . "ORDER BY name ";
         $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.merchandise', 'product');
@@ -168,11 +168,11 @@ function ciniki_merchandise_web_processRequest(&$ciniki, $settings, $business_id
             . "ciniki_merchandise.synopsis, "
             . "'yes' AS is_details "
             . "FROM ciniki_merchandise_tags, ciniki_merchandise "
-            . "WHERE ciniki_merchandise_tags.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE ciniki_merchandise_tags.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND ciniki_merchandise_tags.tag_type = 10 "
             . "AND ciniki_merchandise_tags.permalink = '" . ciniki_core_dbQuote($ciniki, $category['permalink']) . "' "
             . "AND ciniki_merchandise_tags.product_id = ciniki_merchandise.id "
-            . "AND ciniki_merchandise.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "AND ciniki_merchandise.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND (ciniki_merchandise.flags&0x01) = 0x01 "
             . "ORDER BY ciniki_merchandise.code, ciniki_merchandise.name "
             . "";
@@ -200,7 +200,7 @@ function ciniki_merchandise_web_processRequest(&$ciniki, $settings, $business_id
             $ciniki['response']['head']['links'][] = array('rel'=>'canonical', 'href'=>$args['base_url'] . '/' . $product_permalink);
         }
         ciniki_core_loadMethod($ciniki, 'ciniki', 'merchandise', 'web', 'productLoad');
-        $rc = ciniki_merchandise_web_productLoad($ciniki, $business_id, array('permalink'=>$product_permalink, 'images'=>'yes'));
+        $rc = ciniki_merchandise_web_productLoad($ciniki, $tnid, array('permalink'=>$product_permalink, 'images'=>'yes'));
         if( $rc['stat'] != 'ok' ) {
             return array('stat'=>'404', 'err'=>array('code'=>'ciniki.merchandise.24', 'msg'=>"We're sorry, the page you requested is not available."));
         }

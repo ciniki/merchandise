@@ -1,5 +1,5 @@
 //
-// This app will handle the listing, additions and deletions of merchandise.  These are associated business.
+// This app will handle the listing, additions and deletions of merchandise.  These are associated tenant.
 //
 function ciniki_merchandise_main() {
     //
@@ -37,7 +37,7 @@ function ciniki_merchandise_main() {
     this.menu.noData = function(s) { return this.sections[s].noData; }
     this.menu.liveSearchCb = function(s, i, v) {
         if( s == 'product_search' && v != '' ) {
-            M.api.getJSONBgCb('ciniki.merchandise.productSearch', {'business_id':M.curBusinessID, 'start_needle':v, 'limit':'50'}, function(rsp) {
+            M.api.getJSONBgCb('ciniki.merchandise.productSearch', {'tnid':M.curTenantID, 'start_needle':v, 'limit':'50'}, function(rsp) {
                     M.ciniki_merchandise_main.menu.liveSearchShow('product_search',null,M.gE(M.ciniki_merchandise_main.menu.panelUID + '_' + s), rsp.products);
                 });
         }
@@ -67,7 +67,7 @@ function ciniki_merchandise_main() {
     this.menu.open = function(cb, tab) {
         this.data = {};
         //if( tab != null ) { this.sections._tabs.selected = tab; }
-        args = {'business_id':M.curBusinessID};
+        args = {'tnid':M.curTenantID};
         method = 'ciniki.merchandise.productList';
 //        switch( this.sections._tabs.selected ) {
 //            case 'products': method = 'ciniki.merchandise.productList'; break;
@@ -167,7 +167,7 @@ function ciniki_merchandise_main() {
     };
     this.product.refreshImages = function() {
         if( M.ciniki_merchandise_main.product.product_id > 0 ) {
-            M.api.getJSONCb('ciniki.merchandise.productGet', {'business_id':M.curBusinessID, 'product_id':this.product_id, 'images':'yes'}, function(rsp) {
+            M.api.getJSONCb('ciniki.merchandise.productGet', {'tnid':M.curTenantID, 'product_id':this.product_id, 'images':'yes'}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -180,7 +180,7 @@ function ciniki_merchandise_main() {
         }
     }
     this.product.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.merchandise.productHistory', 'args':{'business_id':M.curBusinessID, 'product_id':this.product_id, 'field':i}};
+        return {'method':'ciniki.merchandise.productHistory', 'args':{'tnid':M.curTenantID, 'product_id':this.product_id, 'field':i}};
     }
     this.product.cellValue = function(s, i, j, d) {
         switch(j) {
@@ -190,7 +190,7 @@ function ciniki_merchandise_main() {
     }
     this.product.liveSearchCb = function(s, i, v) {
         if( i == 'name' && v != '' ) {
-            M.api.getJSONBgCb('ciniki.merchandise.productSearch', {'business_id':M.curBusinessID, 'start_needle':v},
+            M.api.getJSONBgCb('ciniki.merchandise.productSearch', {'tnid':M.curTenantID, 'start_needle':v},
                 function(rsp) {
                     M.ciniki_merchandise_main.product.liveSearchShow(s, i, M.gE(M.ciniki_merchandise_main.product.panelUID + '_' + i), rsp.products);
                 });
@@ -208,7 +208,7 @@ function ciniki_merchandise_main() {
         }
     }
     this.product.addObjRef = function(id) {
-        M.api.getJSONCb('ciniki.merchandise.productAddObjRef', {'business_id':M.curBusinessID, 'product_id':id, 'object':this.object, 'object_id':this.object_id},
+        M.api.getJSONCb('ciniki.merchandise.productAddObjRef', {'tnid':M.curTenantID, 'product_id':id, 'object':this.object, 'object_id':this.object_id},
             function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
@@ -223,7 +223,7 @@ function ciniki_merchandise_main() {
             if( this.object != null && this.object != '' ) {
                 c += '&object=' + this.object + '&object_id=' + this.object_id;
             }
-            M.api.postJSONCb('ciniki.merchandise.productAdd', {'business_id':M.curBusinessID, 'product_id':this.product_id, 'image_id':iid}, c,
+            M.api.postJSONCb('ciniki.merchandise.productAdd', {'tnid':M.curTenantID, 'product_id':this.product_id, 'image_id':iid}, c,
                 function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -233,7 +233,7 @@ function ciniki_merchandise_main() {
                     M.ciniki_merchandise_main.product.refreshImages();
                 });
         } else {
-            M.api.getJSONCb('ciniki.merchandise.imageAdd', {'business_id':M.curBusinessID, 'image_id':iid, 'name':'', 'product_id':this.product_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.merchandise.imageAdd', {'tnid':M.curTenantID, 'image_id':iid, 'name':'', 'product_id':this.product_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -249,7 +249,7 @@ function ciniki_merchandise_main() {
         if( list != null ) { this.nextPrevList = list; }
         if( obj != null ) { this.object = obj; }
         if( obj_id != null ) { this.object_id = obj_id; }
-        M.api.getJSONCb('ciniki.merchandise.productGet', {'business_id':M.curBusinessID, 'product_id':this.product_id, 'images':'yes'}, function(rsp) {
+        M.api.getJSONCb('ciniki.merchandise.productGet', {'tnid':M.curTenantID, 'product_id':this.product_id, 'images':'yes'}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -269,7 +269,7 @@ function ciniki_merchandise_main() {
         if( this.product_id > 0 ) {
             var c = this.serializeForm('no');
             if( c != '' ) {
-                M.api.postJSONCb('ciniki.merchandise.productUpdate', {'business_id':M.curBusinessID, 'product_id':this.product_id}, c,
+                M.api.postJSONCb('ciniki.merchandise.productUpdate', {'tnid':M.curTenantID, 'product_id':this.product_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -285,7 +285,7 @@ function ciniki_merchandise_main() {
             if( this.object != null && this.object != '' ) {
                 c += '&object=' + this.object + '&object_id=' + this.object_id;
             }
-            M.api.postJSONCb('ciniki.merchandise.productAdd', {'business_id':M.curBusinessID, 'product_id':this.product_id}, c,
+            M.api.postJSONCb('ciniki.merchandise.productAdd', {'tnid':M.curTenantID, 'product_id':this.product_id}, c,
                 function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -298,7 +298,7 @@ function ciniki_merchandise_main() {
     };
     this.product.removeObjRef = function(event, i) {
         if( confirm('Are you sure you want to remove the product from ' + this.data.objrefs[i].display_name + '?') ) {
-            M.api.getJSONCb('ciniki.merchandise.productDeleteObjRef', {'business_id':M.curBusinessID, 'objref_id':this.data.objrefs[i].id}, function(rsp) {
+            M.api.getJSONCb('ciniki.merchandise.productDeleteObjRef', {'tnid':M.curTenantID, 'objref_id':this.data.objrefs[i].id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -310,7 +310,7 @@ function ciniki_merchandise_main() {
     }
     this.product.remove = function() {
         if( confirm('Do you want to remove this product? It will be removed from your shop and all other items it is attached to.') ) {
-            M.api.getJSONCb('ciniki.merchandise.productDelete', {'business_id':M.curBusinessID, 'product_id':this.product_id}, function(rsp) {
+            M.api.getJSONCb('ciniki.merchandise.productDelete', {'tnid':M.curTenantID, 'product_id':this.product_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -364,7 +364,7 @@ function ciniki_merchandise_main() {
         return ''; 
     };
     this.productimage.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.merchandise.imageHistory', 'args':{'business_id':M.curBusinessID, 'productimage_id':this.productimage_id, 'field':i}};
+        return {'method':'ciniki.merchandise.imageHistory', 'args':{'tnid':M.curTenantID, 'productimage_id':this.productimage_id, 'field':i}};
     };
     this.productimage.addDropImage = function(iid) {
         M.ciniki_merchandise_main.productimage.setFieldValue('image_id', iid, null, null);
@@ -375,7 +375,7 @@ function ciniki_merchandise_main() {
         if( pid != null ) { this.product_id = pid; }
         this.reset();
         this.sections._buttons.buttons.delete.visible = 'yes';
-        M.api.getJSONCb('ciniki.merchandise.imageGet', {'business_id':M.curBusinessID, 'productimage_id':this.productimage_id}, function(rsp) {
+        M.api.getJSONCb('ciniki.merchandise.imageGet', {'tnid':M.curTenantID, 'productimage_id':this.productimage_id}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
@@ -390,7 +390,7 @@ function ciniki_merchandise_main() {
         if( this.productimage_id > 0 ) {
             var c = this.serializeFormData('no');
             if( c != '' ) {
-                M.api.postJSONFormData('ciniki.merchandise.imageUpdate', {'business_id':M.curBusinessID, 
+                M.api.postJSONFormData('ciniki.merchandise.imageUpdate', {'tnid':M.curTenantID, 
                     'productimage_id':this.productimage_id}, c, function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -404,7 +404,7 @@ function ciniki_merchandise_main() {
             }
         } else {
             var c = this.serializeFormData('yes');
-            M.api.postJSONFormData('ciniki.merchandise.imageAdd', {'business_id':M.curBusinessID, 'product_id':this.product_id}, c, function(rsp) {
+            M.api.postJSONFormData('ciniki.merchandise.imageAdd', {'tnid':M.curTenantID, 'product_id':this.product_id}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -416,7 +416,7 @@ function ciniki_merchandise_main() {
     };
     this.productimage.remove = function() {
         if( confirm('Are you sure you want to delete this image?') ) {
-            M.api.getJSONCb('ciniki.merchandise.imageDelete', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.merchandise.imageDelete', {'tnid':M.curTenantID, 
                 'productimage_id':this.productimage_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);

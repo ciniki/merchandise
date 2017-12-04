@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:        The ID of the business to get Merchandise Product for.
+// tnid:        The ID of the tenant to get Merchandise Product for.
 //
 // Returns
 // -------
@@ -19,7 +19,7 @@ function ciniki_merchandise_productSearch($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'start_needle'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Search String'),
         'limit'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Limit'),
         ));
@@ -29,10 +29,10 @@ function ciniki_merchandise_productSearch($ciniki) {
     $args = $rc['args'];
 
     //
-    // Check access to business_id as owner, or sys admin.
+    // Check access to tnid as owner, or sys admin.
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'merchandise', 'private', 'checkAccess');
-    $rc = ciniki_merchandise_checkAccess($ciniki, $args['business_id'], 'ciniki.merchandise.productList');
+    $rc = ciniki_merchandise_checkAccess($ciniki, $args['tnid'], 'ciniki.merchandise.productList');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -59,7 +59,7 @@ function ciniki_merchandise_productSearch($ciniki) {
         . "ciniki_merchandise.synopsis, "
         . "ciniki_merchandise.description "
         . "FROM ciniki_merchandise "
-        . "WHERE ciniki_merchandise.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE ciniki_merchandise.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "";
     if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.merchandise', 0x01) ) {
         $strsql .= "AND (code LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "

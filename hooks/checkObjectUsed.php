@@ -9,7 +9,7 @@
 // Returns
 // -------
 //
-function ciniki_merchandise_hooks_checkObjectUsed($ciniki, $business_id, $args) {
+function ciniki_merchandise_hooks_checkObjectUsed($ciniki, $tnid, $args) {
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbCount');
 
@@ -24,7 +24,7 @@ function ciniki_merchandise_hooks_checkObjectUsed($ciniki, $business_id, $args) 
         //
         $strsql = "SELECT 'items', COUNT(*) "
             . "FROM ciniki_merchandise_objrefs "
-            . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND object = '" . ciniki_core_dbQuote($ciniki, $args['object']) . "' "
             . "AND object_id = '" . ciniki_core_dbQuote($ciniki, $args['object_id']) . "' "
             . "";

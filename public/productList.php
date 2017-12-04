@@ -2,13 +2,13 @@
 //
 // Description
 // -----------
-// This method will return the list of Merchandise Products for a business.
+// This method will return the list of Merchandise Products for a tenant.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:        The ID of the business to get Merchandise Product for.
+// tnid:        The ID of the tenant to get Merchandise Product for.
 //
 // Returns
 // -------
@@ -19,7 +19,7 @@ function ciniki_merchandise_productList($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -27,10 +27,10 @@ function ciniki_merchandise_productList($ciniki) {
     $args = $rc['args'];
 
     //
-    // Check access to business_id as owner, or sys admin.
+    // Check access to tnid as owner, or sys admin.
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'merchandise', 'private', 'checkAccess');
-    $rc = ciniki_merchandise_checkAccess($ciniki, $args['business_id'], 'ciniki.merchandise.productList');
+    $rc = ciniki_merchandise_checkAccess($ciniki, $args['tnid'], 'ciniki.merchandise.productList');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -61,15 +61,15 @@ function ciniki_merchandise_productList($ciniki) {
         $strsql .= "FROM ciniki_merchandise_tags "
             . "INNER JOIN ciniki_merchandise ON ("
                 . "ciniki_merchandise_tags.product_id = ciniki_merchandise.id "
-                . "AND ciniki_merchandise.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "AND ciniki_merchandise.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . ") "
             . "WHERE ciniki_merchandise_tags.tag_name = '" . ciniki_core_dbQuote($ciniki, $args['category']) . "' "
             . "AND ciniki_merchandise_tags.tag_type = 10 "
-            . "AND ciniki_merchandise.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND ciniki_merchandise.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "";
     } else {
         $strsql .= "FROM ciniki_merchandise "
-            . "WHERE ciniki_merchandise.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "WHERE ciniki_merchandise.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "";
     }
     $strsql .= "ORDER BY ciniki_merchandise.code, ciniki_merchandise.name "

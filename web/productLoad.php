@@ -8,13 +8,13 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business the product is attached to.
+// tnid:         The ID of the tenant the product is attached to.
 // product_id:          The ID of the product to get the details for.
 //
 // Returns
 // -------
 //
-function ciniki_merchandise_web_productLoad($ciniki, $business_id, $args) {
+function ciniki_merchandise_web_productLoad($ciniki, $tnid, $args) {
     
     $strsql = "SELECT ciniki_merchandise.id, "
         . "ciniki_merchandise.uuid, "
@@ -26,7 +26,7 @@ function ciniki_merchandise_web_productLoad($ciniki, $business_id, $args) {
         . "ciniki_merchandise.synopsis, "
         . "ciniki_merchandise.description "
         . "FROM ciniki_merchandise "
-        . "WHERE ciniki_merchandise.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE ciniki_merchandise.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "";
     if( isset($args['permalink']) && $args['permalink'] != '' ) {
         $strsql .= "AND ciniki_merchandise.permalink = '" . ciniki_core_dbQuote($ciniki, $args['permalink']) . "' ";
@@ -57,7 +57,7 @@ function ciniki_merchandise_web_productLoad($ciniki, $business_id, $args) {
             . "description "
             . "FROM ciniki_merchandise_images "
             . "WHERE product_id = '" . ciniki_core_dbQuote($ciniki, $product['id']) . "' "
-            . "AND business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "";
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.merchandise', array(

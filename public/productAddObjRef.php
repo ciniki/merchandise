@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:        The ID of the business to add the Merchandise Product to.
+// tnid:        The ID of the tenant to add the Merchandise Product to.
 //
 // Returns
 // -------
@@ -20,7 +20,7 @@ function ciniki_merchandise_productAddObjRef(&$ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'product_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Product'),
         'object'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Object'),
         'object_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Object ID'),
@@ -31,10 +31,10 @@ function ciniki_merchandise_productAddObjRef(&$ciniki) {
     $args = $rc['args'];
 
     //
-    // Check access to business_id as owner
+    // Check access to tnid as owner
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'merchandise', 'private', 'checkAccess');
-    $rc = ciniki_merchandise_checkAccess($ciniki, $args['business_id'], 'ciniki.merchandise.productAddObjRef');
+    $rc = ciniki_merchandise_checkAccess($ciniki, $args['tnid'], 'ciniki.merchandise.productAddObjRef');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -44,7 +44,7 @@ function ciniki_merchandise_productAddObjRef(&$ciniki) {
     //
     $strsql = "SELECT id, code, permalink "
         . "FROM ciniki_merchandise "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND id = '" . ciniki_core_dbQuote($ciniki, $args['product_id']) . "' "
         . "";
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.merchandise', 'item');
@@ -60,7 +60,7 @@ function ciniki_merchandise_productAddObjRef(&$ciniki) {
     //
     $strsql = "SELECT id "
         . "FROM ciniki_merchandise_objrefs "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND product_id = '" . ciniki_core_dbQuote($ciniki, $args['product_id']) . "' "
         . "AND object = '" . ciniki_core_dbQuote($ciniki, $args['object']) . "' "
         . "AND object_id = '" . ciniki_core_dbQuote($ciniki, $args['object_id']) . "' "
@@ -89,7 +89,7 @@ function ciniki_merchandise_productAddObjRef(&$ciniki) {
     //
     // If the object is specified
     //
-    $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.merchandise.objref', array(
+    $rc = ciniki_core_objectAdd($ciniki, $args['tnid'], 'ciniki.merchandise.objref', array(
         'product_id'=>$args['product_id'],
         'object'=>$args['object'],
         'object_id'=>$args['object_id'],
@@ -108,11 +108,11 @@ function ciniki_merchandise_productAddObjRef(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'merchandise');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'merchandise');
 
     return array('stat'=>'ok');
 }

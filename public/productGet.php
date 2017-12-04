@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business the merchandise product is attached to.
+// tnid:         The ID of the tenant the merchandise product is attached to.
 // product_id:          The ID of the merchandise product to get the details for.
 //
 // Returns
@@ -20,7 +20,7 @@ function ciniki_merchandise_productGet($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'),
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'product_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Merchandise Product'),
         'images'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Images'),
         ));
@@ -31,19 +31,19 @@ function ciniki_merchandise_productGet($ciniki) {
 
     //
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'merchandise', 'private', 'checkAccess');
-    $rc = ciniki_merchandise_checkAccess($ciniki, $args['business_id'], 'ciniki.merchandise.productGet');
+    $rc = ciniki_merchandise_checkAccess($ciniki, $args['tnid'], 'ciniki.merchandise.productGet');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
 
     //
-    // Load business settings
+    // Load tenant settings
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $args['tnid']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -103,7 +103,7 @@ function ciniki_merchandise_productGet($ciniki) {
             . "ciniki_merchandise.synopsis, "
             . "ciniki_merchandise.description "
             . "FROM ciniki_merchandise "
-            . "WHERE ciniki_merchandise.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "WHERE ciniki_merchandise.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND ciniki_merchandise.id = '" . ciniki_core_dbQuote($ciniki, $args['product_id']) . "' "
             . "";
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
@@ -129,7 +129,7 @@ function ciniki_merchandise_productGet($ciniki) {
             $strsql = "SELECT tag_type, tag_name AS lists "
                 . "FROM ciniki_merchandise_tags "
                 . "WHERE product_id = '" . ciniki_core_dbQuote($ciniki, $args['product_id']) . "' "
-                . "AND business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "ORDER BY tag_type, tag_name "
                 . "";
             ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
@@ -169,7 +169,7 @@ function ciniki_merchandise_productGet($ciniki) {
                 $rc = ciniki_core_loadMethod($ciniki, $pkg, $mod, 'hooks', 'getObjectName');
                 if( $rc['stat'] == 'ok' ) {
                     $fn = $rc['function_call'];
-                    $rc = $fn($ciniki, $args['business_id'], array(
+                    $rc = $fn($ciniki, $args['tnid'], array(
                         'object'=>$ref['object'],
                         'object_id'=>$ref['object_id']
                         ));
@@ -194,7 +194,7 @@ function ciniki_merchandise_productGet($ciniki) {
                 . "ciniki_merchandise_images.description "
                 . "FROM ciniki_merchandise_images "
                 . "WHERE ciniki_merchandise_images.product_id = '" . ciniki_core_dbQuote($ciniki, $args['product_id']) . "' "
-                . "AND ciniki_merchandise_images.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+                . "AND ciniki_merchandise_images.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . "ORDER BY ciniki_merchandise_images.sequence, ciniki_merchandise_images.date_added, ciniki_merchandise_images.name "
                 . "";
             $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.artcatalog', array(
@@ -207,7 +207,7 @@ function ciniki_merchandise_productGet($ciniki) {
                 $product['images'] = $rc['images'];
                 foreach($product['images'] as $inum => $img) {
                     if( isset($img['image_id']) && $img['image_id'] > 0 ) {
-                        $rc = ciniki_images_hooks_loadThumbnail($ciniki, $args['business_id'], array('image_id'=>$img['image_id'], 'maxlength'=>75));
+                        $rc = ciniki_images_hooks_loadThumbnail($ciniki, $args['tnid'], array('image_id'=>$img['image_id'], 'maxlength'=>75));
                         if( $rc['stat'] != 'ok' ) {
                             return $rc;
                         }
@@ -229,7 +229,7 @@ function ciniki_merchandise_productGet($ciniki) {
         // Get the available tags
         //
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQueryList');
-        $strsql = "SELECT DISTINCT tag_name FROM ciniki_merchandise_tags WHERE tag_type = 10 AND business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' ";
+        $strsql = "SELECT DISTINCT tag_name FROM ciniki_merchandise_tags WHERE tag_type = 10 AND tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' ";
         $rc = ciniki_core_dbQueryList($ciniki, $strsql, 'ciniki.merchandise', 'categories', 'tag_name');
         if( $rc['stat'] != 'ok' ) {
             return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.merchandise.19', 'msg'=>'Unable to get list of categories', 'err'=>$rc['err']));
