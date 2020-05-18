@@ -297,8 +297,8 @@ function ciniki_merchandise_main() {
         }
     };
     this.product.removeObjRef = function(event, i) {
-        if( confirm('Are you sure you want to remove the product from ' + this.data.objrefs[i].display_name + '?') ) {
-            M.api.getJSONCb('ciniki.merchandise.productDeleteObjRef', {'tnid':M.curTenantID, 'objref_id':this.data.objrefs[i].id}, function(rsp) {
+        M.confirm('Are you sure you want to remove the product from ' + this.data.objrefs[i].display_name + '?',null,function() {
+            M.api.getJSONCb('ciniki.merchandise.productDeleteObjRef', {'tnid':M.curTenantID, 'objref_id':M.ciniki_merchandise_main.product.data.objrefs[i].id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -306,18 +306,18 @@ function ciniki_merchandise_main() {
                 delete(M.ciniki_merchandise_main.product.data.objrefs[i]);
                 M.ciniki_merchandise_main.product.refreshSection('objrefs');
             });
-        }
+        });
     }
     this.product.remove = function() {
-        if( confirm('Do you want to remove this product? It will be removed from your shop and all other items it is attached to.') ) {
-            M.api.getJSONCb('ciniki.merchandise.productDelete', {'tnid':M.curTenantID, 'product_id':this.product_id}, function(rsp) {
+        M.confirm('Do you want to remove this product? It will be removed from your shop and all other items it is attached to.',null,function() {
+            M.api.getJSONCb('ciniki.merchandise.productDelete', {'tnid':M.curTenantID, 'product_id':M.ciniki_merchandise_main.product.product_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
                 } 
                 M.ciniki_merchandise_main.product.close();
             });
-        }
+        });
     };
     this.product.nextButtonFn = function() {
         if( this.nextPrevList != null && this.nextPrevList.indexOf('' + this.product_id) < (this.nextPrevList.length - 1) ) {
@@ -415,16 +415,16 @@ function ciniki_merchandise_main() {
         }
     };
     this.productimage.remove = function() {
-        if( confirm('Are you sure you want to delete this image?') ) {
+        M.confirm('Are you sure you want to delete this image?',null,function() {
             M.api.getJSONCb('ciniki.merchandise.imageDelete', {'tnid':M.curTenantID, 
-                'productimage_id':this.productimage_id}, function(rsp) {
+                'productimage_id':M.ciniki_merchandise_main.productimage.productimage_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
                     }
                     M.ciniki_merchandise_main.productimage.close();
                 });
-        }
+        });
     };
     this.productimage.addButton('save', 'Save', 'M.ciniki_merchandise_main.productimage.save();');
     this.productimage.addClose('Cancel');
@@ -443,7 +443,7 @@ function ciniki_merchandise_main() {
         //
         var appContainer = M.createContainer(appPrefix, 'ciniki_merchandise_main', 'yes');
         if( appContainer == null ) {
-            alert('App Error');
+            M.alert('App Error');
             return false;
         } 
 
